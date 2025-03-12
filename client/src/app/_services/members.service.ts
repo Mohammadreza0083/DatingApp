@@ -3,6 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import {member} from '../_models/member';
 import {of, tap} from 'rxjs';
+import {photo} from '../_models/photo';
 
 @Injectable({
   providedIn: 'root'
@@ -34,5 +35,32 @@ export class MembersService {
         );
     }
 
+    setMainPhoto(photo: photo){
+        return this.http.put(this.baseUrl + 'users/set-main-photo/' + photo.id, {}).pipe(
+            tap(()=>{
+                this.members.update(members=>members.map(
+                    m=>{
+                        if (m.photos.includes(photo)){
+                            m.photoUrl = photo.url;
+                        }
+                        return m;
+                    }
+                ))
+            }));
+    }
 
+    deletePhoto(photo: photo){
+        return this.http.delete(this.baseUrl + 'users/delete-photo/' + photo.id).pipe(
+            tap(()=>{
+                this.members.update(members=>members.map(
+                    m=>{
+                        if (m.photos.includes(photo)){
+                            m.photos = m.photos.filter(p=>p.id!==photo.id);
+                            m.photoUrl = photo.url;
+                        }
+                        return m;
+                    }
+                ))
+            }));
+    }
 }

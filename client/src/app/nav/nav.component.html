@@ -36,6 +36,11 @@
         data-bs-toggle="dropdown"
         aria-expanded="false"
         >
+          <img
+              class="me-1"
+              src="{{accountServices.currentUser()?.photoUrl || '/assets/user.png'}}"
+                alt="User main photo"
+          >
         Welcome {{accountServices.currentUser()?.username | titlecase}}
         </a
       >
