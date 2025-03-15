@@ -104,4 +104,10 @@ public class UserRepository(DataContext context, IMapper mapper): IUserRepositor
             .SingleOrDefaultAsync();
         return membersDto;
     }
+
+    public async Task<bool> AddUserAsync(AppUsers user)
+    {
+        await context.Users.AddAsync(user);
+        return await context.SaveChangesAsync() > 0;
+    }
 }

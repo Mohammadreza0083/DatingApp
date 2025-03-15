@@ -1,9 +1,42 @@
 <form [formGroup]="registerForm" (ngSubmit)="register()" autocomplete="off">
   <h2 class="text-center text-primary">Sign Up</h2>
   <hr>
+    <div class="mb-3">
+        <label class="d-flex flex-md-fill">I'm a :</label>
+        <label class="form-check-label me-2">
+            <input type="radio" class="form-check-input" value="male" formControlName="gender"> Male
+        </label>
+        <label class="form-check-label">
+            <input type="radio" class="form-check-input" value="female" formControlName="gender"> Female
+        </label>
+    </div>
     <app-text-input
         [formControl]="$any(registerForm.controls['username'])"
         [label]="'Username'"
+        [type]="'text'"
+    >
+    </app-text-input>
+    <app-text-input
+        [formControl]="$any(registerForm.controls['knownAs'])"
+        [label]="'Known as'"
+        [type]="'text'"
+    >
+    </app-text-input>
+    <app-date-picker
+        [formControl]="$any(registerForm.controls['dateOfBirth'])"
+        [label]="'Date of birth'"
+        [maxDate]="maxDate"
+    >
+    </app-date-picker>
+    <app-text-input
+        [formControl]="$any(registerForm.controls['city'])"
+        [label]="'City'"
+        [type]="'text'"
+    >
+    </app-text-input>
+    <app-text-input
+        [formControl]="$any(registerForm.controls['country'])"
+        [label]="'Country'"
         [type]="'text'"
     >
     </app-text-input>
@@ -24,6 +57,16 @@
         >
         </app-text-input>
     </div>
+
+    @if (validationErrors){
+        <div class="alert alert-danger text-start">
+            <ul>
+                @for (errors of validationErrors ; track $index) {
+                    <li class="text-danger">{{errors}}</li>
+                }
+            </ul>
+        </div>
+    }
     <div class="form-group text-center">
         <button
             type="submit"

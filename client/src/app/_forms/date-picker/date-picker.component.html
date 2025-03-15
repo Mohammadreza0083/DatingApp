@@ -1,0 +1,23 @@
+<div class="mb-3 form-floating">
+    <input
+        [formControl]="control"
+        class="form-control"
+        [class.is-invalid]="isInvalid"
+        [class.is-valid]="isValid"
+        bsDatepicker
+        [bsConfig]="bsConfig"
+        [maxDate]="maxDate()"
+    />
+
+    <label>{{ label }}</label>
+
+    <div *ngIf="isInvalid" class="text-danger">
+        <div *ngIf="ngControl?.control?.errors?.['required']">
+            {{ label }} is required
+        </div>
+    </div>
+
+    <div *ngIf="isValid" class="text-success">
+        Looks good!
+    </div>
+</div>
