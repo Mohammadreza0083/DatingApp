@@ -29,10 +29,10 @@ export class RegisterComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   cancelRegister = output<boolean>();
-  registerModel: any = {};
   registerForm: FormGroup = new FormGroup({});
   maxDate = new Date();
   validationErrors: string[] | undefined;
+    isSubmitting = false;
 
   ngOnInit() {
       this.initializeForm();
@@ -58,6 +58,8 @@ export class RegisterComponent implements OnInit {
     }
 
   register() {
+      if (this.isSubmitting) return;
+      this.isSubmitting = true;
     const dob = this.getDateOnly(this.registerForm.get('dateOfBirth')?.value);
     this.registerForm.patchValue({dateOfBirth: dob});
     this.accountService.Register(this.registerForm.value).subscribe({
@@ -68,6 +70,7 @@ export class RegisterComponent implements OnInit {
       error: (error) => {
         this.validationErrors = error.errors;
         this.toaster.error(error.error);
+        this.isSubmitting = false;
       },
     });
   }

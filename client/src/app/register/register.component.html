@@ -71,7 +71,7 @@
         <button
             type="submit"
             (click)="register()"
-            [disabled]="!registerForm.valid"
+            [disabled]="!registerForm.valid || isSubmitting"
             class="btn btn-success me-2">
             Register
         </button>
@@ -83,5 +83,3 @@
         </button>
     </div>
 </form>>
-<p>Form value: {{registerForm.value | json}}</p>
-<p>Form status: {{registerForm["status"] | json}}</p>
