@@ -1,6 +1,7 @@
 using API.DTO;
 using API.Entities;
 using API.Extensions;
+using API.Helpers;
 using API.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -14,10 +15,11 @@ namespace API.Controllers
         : BaseApiController
     {
         [HttpGet]
-        public async Task<ActionResult<List<MembersDto>>> GetUsers()
+        public async Task<ActionResult<List<MembersDto>>> GetUsers([FromQuery] UserParams userParams)
         {
-            var users = await userRepository.GetAllMembersAsync();
+            var users = await userRepository.GetAllMembersAsync(userParams);
             if(users.Count is 0) return NotFound("No users found");
+            Response.AddPaginationHeader(users);
             return users;
         }
         [HttpGet("{username}")]
