@@ -1,7 +1,6 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace API.DTOs;
+namespace API.DTO;
 
 public class UserDto
 {
@@ -13,6 +12,9 @@ public class UserDto
 
     [Required]
     public required string Token { get; set; }
+    
+    [Required] 
+    public required string Gender { get; set; }
 
     public string? PhotoUrl { get; set; }
 }

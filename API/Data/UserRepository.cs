@@ -86,10 +86,23 @@ public class UserRepository(DataContext context, IMapper mapper): IUserRepositor
     /// <returns>list of MemberDto or Null</returns>
     public async Task<PagedList<MembersDto>> GetAllMembersAsync(UserParams userParams)
     {
-        var query = context.Users
-            .ProjectTo<MembersDto>(mapper.ConfigurationProvider);
+        var query = context.Users.AsQueryable();
         
-        return await PagedList<MembersDto>.CreateAsync(query, userParams.PageNum, userParams.PageSize);
+        query = query.Where(u=> u.UserName != userParams.CurrentUsername);
+
+        if (userParams.Gender != null)
+        {
+            query = query.Where(u => u.Gender == userParams.Gender);
+        }
+        
+        var minDob = DateOnly.FromDateTime(DateTime.Now.AddYears(-userParams.MaxAge - 1));
+        
+        var maxDob = DateOnly.FromDateTime(DateTime.Now.AddYears(-userParams.MinAge));
+        
+        query = query.Where(u => u.DateOfBirth >= minDob && u.DateOfBirth <= maxDob);
+        
+        return await PagedList<MembersDto>.CreateAsync(query.ProjectTo<MembersDto>(mapper.ConfigurationProvider),
+            userParams.PageNum, userParams.PageSize);
     }
 
     /// <summary>
@@ -108,6 +121,13 @@ public class UserRepository(DataContext context, IMapper mapper): IUserRepositor
 
     public async Task<bool> AddUserAsync(AppUsers user)
     {
+        await context.Users.AddAsync(user);
+        if (await context.Users.SingleOrDefaultAsync(u => u.UserName == user.UserName) 
+            is not null)
+        {
+            return false;
+        }
+
         await context.Users.AddAsync(user);
         return await context.SaveChangesAsync() > 0;
     }

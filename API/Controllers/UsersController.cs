@@ -17,6 +17,7 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<List<MembersDto>>> GetUsers([FromQuery] UserParams userParams)
         {
+            userParams.CurrentUsername = User.GetUsername();
             var users = await userRepository.GetAllMembersAsync(userParams);
             if(users.Count is 0) return NotFound("No users found");
             Response.AddPaginationHeader(users);

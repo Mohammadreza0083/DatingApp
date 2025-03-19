@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
-using API.DTOs;
+using API.DTO;
 using API.Entities;
 using API.Interfaces;
 using AutoMapper;
@@ -30,6 +30,7 @@ public class AccountController(IUserRepository userRepository,
             Username = user.UserName, 
             KnownAs = user.KnownAs,
             Token = tokenServices.CreateToken(user),
+            Gender = user.Gender,
             PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
         };
     }
@@ -37,9 +38,6 @@ public class AccountController(IUserRepository userRepository,
     [HttpPost("register")]
     public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
     {
-        if (await UserExists(registerDto.Username))
-            return BadRequest("Username is taken");
-        
         using var hmc = new HMACSHA512();
 
         var user = mapper.Map<AppUsers>(registerDto);
@@ -47,17 +45,17 @@ public class AccountController(IUserRepository userRepository,
         user.PasswordHash = hmc.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password));
         user.PasswordSalt = hmc.Key;
 
-        await userRepository.AddUserAsync(user);
-        return new UserDto
+        if (await userRepository.AddUserAsync(user))
         {
-            Username = user.UserName,
-            KnownAs = user.KnownAs,
-            Token = tokenServices.CreateToken(user)
-        };
-    }
-
-    private async Task<bool> UserExists(string username)
-    {
-        return await userRepository.GetUserByUsernameAsync(username) is not null;
+            return new UserDto
+            {
+                Username = user.UserName,
+                KnownAs = user.KnownAs,
+                Token = tokenServices.CreateToken(user),
+                Gender = user.Gender
+            };
+        }
+        
+        return BadRequest("Username is taken");
     }
 }

@@ -1,14 +1,13 @@
 import {Component, output, inject, OnInit} from '@angular/core';
 import {
     FormBuilder,
-    FormControl,
     FormGroup,
     ReactiveFormsModule,
     Validators
 } from '@angular/forms';
 import { AccountService } from '../_services/account.service';
 import { ToastrService } from 'ngx-toastr';
-import {JsonPipe, NgIf} from '@angular/common';
+import {NgIf} from '@angular/common';
 import {passwordValidator} from '../_validators/password.validator';
 import {usernameValidator} from '../_validators/username.validator';
 import {confirmPasswordValidator} from '../_validators/confrim-password.validator';
@@ -19,7 +18,7 @@ import {Router} from '@angular/router';
 @Component({
   selector: 'app-register',
   standalone: true,
-    imports: [ReactiveFormsModule, JsonPipe, NgIf, TextInputComponent, DatePickerComponent],
+    imports: [ReactiveFormsModule, NgIf, TextInputComponent, DatePickerComponent],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css',
 })
