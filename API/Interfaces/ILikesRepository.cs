@@ -1,5 +1,6 @@
 ﻿using API.DTO;
 using API.Entities;
+using API.Helpers;
 
 namespace API.Interfaces;
 
@@ -7,7 +8,7 @@ public interface ILikesRepository
 {
     Task<UserLike?> GetUserLikeAsync(int sourceUserId, int likedUserId);
     
-    Task<IEnumerable<MembersDto>> GetUserLikesAsync(string predicate, int userId);
+    Task<PagedList<MembersDto>> GetUserLikesAsync(LikesParams likesParams);
     
     Task<IEnumerable<int>> GetCurrentUserLikeIdsAsync(int userId);
     
