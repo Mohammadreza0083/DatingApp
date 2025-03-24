@@ -5,9 +5,8 @@ import {
     ReactiveFormsModule,
     Validators
 } from '@angular/forms';
-import { AccountService } from '../_services/account.service';
-/* import { ToastrService } from 'ngx-toastr';
- */import {NgIf} from '@angular/common';
+import { AccountService } from '../_services/account.service'; import { ToastrService } from 'ngx-toastr';
+ import {NgIf} from '@angular/common';
 import {passwordValidator} from '../_validators/password.validator';
 import {usernameValidator} from '../_validators/username.validator';
 import {confirmPasswordValidator} from '../_validators/confrim-password.validator';
@@ -24,7 +23,7 @@ import {Router} from '@angular/router';
 })
 export class RegisterComponent implements OnInit {
   private readonly accountService = inject(AccountService);
- /*  private readonly toaster = inject(ToastrService); */
+   private readonly toaster = inject(ToastrService); 
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   cancelRegister = output<boolean>();
