@@ -70,6 +70,8 @@ namespace API.Controllers
                 PublicId = result.Result.PublicId
             };
 
+            if (user.Photos.Count == 0) photo.IsMain = true;
+
             if (user.Photos.Count is 0)
             {
                 photo.IsMain = true;
