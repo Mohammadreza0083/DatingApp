@@ -1,3 +1,4 @@
+using System.Reflection.Metadata.Ecma335;
 using API.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +9,8 @@ public class DataContext(DbContextOptions options) : DbContext(options)
     public DbSet<AppUsers> Users { get; set; }
     
     public DbSet<UserLike> Likes { get; set; }
+    
+    public DbSet<Message> Messages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -27,5 +30,15 @@ public class DataContext(DbContextOptions options) : DbContext(options)
             .WithMany(l => l.LikedByUsers)
             .HasForeignKey(t => t.TargetUserId)
             .OnDelete(DeleteBehavior.NoAction);
+        
+        modelBuilder.Entity<Message>()
+            .HasOne(r => r.Recipient)
+            .WithMany(r => r.MessagesReceived)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        modelBuilder.Entity<Message>()
+            .HasOne(s => s.Sender)
+            .WithMany(s => s.MessagesSent)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 } 
