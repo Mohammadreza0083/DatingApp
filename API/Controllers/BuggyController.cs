@@ -1,4 +1,3 @@
-using System;
 using API.Data;
 using API.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -18,17 +17,17 @@ public class BuggyController(DataContext context) : BaseApiController
     [HttpGet("not-found")]
     public ActionResult<AppUsers> GetNotFound()
     {
-        AppUsers? User = context.Users.Find(-1);
-        if (User is null)
+        AppUsers? user = context.Users.Find(-1);
+        if (user is null)
             return NotFound();
-        return User;
+        return user;
     }
 
     [HttpGet("server-error")]
     public ActionResult<AppUsers> GetServerError()
     {
-        AppUsers User = context.Users.Find(-1) ?? throw new Exception("Some server error");
-        return User;
+        AppUsers user = context.Users.Find(-1) ?? throw new Exception("Some server error");
+        return user;
     }
 
     [HttpGet("bad-request")]

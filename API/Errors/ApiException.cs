@@ -1,6 +1,3 @@
-using System;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 namespace API.Errors;
 
 public class ApiException(int statusCode, string message, string? details)

@@ -1,13 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 
 namespace API.Entities;
 
 [Table("Photos")]
 public class Photo
 {
-    public int id { get; init; }
-    
+  [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")] 
+  public int Id { get; set; }
+
     [MaxLength(100)]
     public required string Url { get; init; }
 
@@ -24,5 +26,6 @@ public class Photo
     /// <summary>
     /// Navigation property
     /// </summary>
+    [SuppressMessage("ReSharper", "NullableWarningSuppressionIsUsed")]
     public AppUsers AppUsers { get; set; } = null!;
 }

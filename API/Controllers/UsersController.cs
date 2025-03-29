@@ -6,6 +6,7 @@ using API.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+// ReSharper disable NullableWarningSuppressionIsUsed
 
 namespace API.Controllers
 {
@@ -95,7 +96,7 @@ namespace API.Controllers
             {
                 return BadRequest("No user found");
             }
-            var photo = user.Photos.FirstOrDefault(x => x.id == photoId);
+            var photo = user.Photos.FirstOrDefault(x => x.Id == photoId);
             if (photo is null || photo.IsMain)
             {
                 return BadRequest("Can't set main photo");
@@ -122,7 +123,7 @@ namespace API.Controllers
             {
                 return BadRequest("No user found");
             }
-            var photo = user.Photos.FirstOrDefault(x => x.id == photoId);
+            var photo = user.Photos.FirstOrDefault(x => x.Id == photoId);
             var photos = user.Photos;
             if (photo is null)
             {

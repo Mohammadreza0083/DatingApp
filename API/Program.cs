@@ -1,6 +1,8 @@
 using API.Data;
+using API.Entities;
 using API.Extensions;
 using API.Middleware;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,8 +43,9 @@ IServiceProvider services = scope.ServiceProvider;
 try
 {
     DataContext context = services.GetRequiredService<DataContext>();
+    UserManager<AppUsers> manager = services.GetRequiredService<UserManager<AppUsers>>();
     await context.Database.MigrateAsync();
-    await Seed.SeedUser(context);
+    await Seed.SeedUser(manager, new LoggerFactory().CreateLogger<Program>());
 }
 catch (Exception ex)
 {

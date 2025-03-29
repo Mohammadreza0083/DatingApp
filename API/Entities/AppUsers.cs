@@ -1,18 +1,10 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.CodeAnalysis.Options;
+using Microsoft.AspNetCore.Identity;
 
 namespace API.Entities;
 
-public class AppUsers
+public class AppUsers:IdentityUser<int>
 {
-    public int Id { get; init; }
-    [MaxLength(20)]
-    public required string UserName { get; set; }
-
-    public byte[] PasswordHash { get; set; } = [];
-
-    public byte[] PasswordSalt { get; set; } = [];
-    
     public DateOnly DateOfBirth { get; init; }
     
     [MaxLength(25)]
@@ -49,4 +41,6 @@ public class AppUsers
     public List<Message> MessagesSent { get; set; } = [];
 
     public List<Message> MessagesReceived { get; set; }= [];
+    
+    public ICollection<AppUserRole> UserRoles{ get; set; }= new List<AppUserRole>();
 }

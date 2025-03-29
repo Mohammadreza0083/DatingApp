@@ -1,16 +1,15 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
 using API.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
 
 public class Seed
 {
-    public static async Task SeedUser(DataContext db)
+    public static async Task SeedUser(UserManager<AppUsers> manager, ILogger logger)
     {
-        if (await db.Users.AnyAsync())
+        if (await manager.Users.AnyAsync())
         {
             return;
         }
@@ -30,13 +29,9 @@ public class Seed
 
         foreach (AppUsers user in users)
         {
-            using HMACSHA512 hmac = new HMACSHA512();
-
-            user.UserName = user.UserName.ToLower();
-            user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes("Pa$$w0rd"));
-            user.PasswordSalt = hmac.Key;
-            db.Users.Add(user);
+            logger.LogInformation($"Seeding user {user.UserName}");
+            await manager.CreateAsync(user, "Pa$$w0rd");
         }
-        await db.SaveChangesAsync();
+        logger.LogInformation("Seeded users successfully");
     }
 }

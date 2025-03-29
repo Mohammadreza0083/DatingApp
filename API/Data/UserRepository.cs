@@ -76,7 +76,7 @@ public class UserRepository(DataContext context, IMapper mapper): IUserRepositor
     {
         AppUsers? user = await context.Users
             .Include(u => u.Photos)
-            .SingleOrDefaultAsync(u => u.UserName == username);
+            .SingleOrDefaultAsync(u => u.NormalizedUserName == username.ToUpper());
         return user;
     }
 
@@ -119,7 +119,7 @@ public class UserRepository(DataContext context, IMapper mapper): IUserRepositor
     public async Task<MembersDto?> GetMemberAsync(string username)
     {
         MembersDto? membersDto = await context.Users
-            .Where(u => u.UserName == username)
+            .Where(u => u.NormalizedUserName == username.ToUpper())
             .ProjectTo<MembersDto>(mapper.ConfigurationProvider)
             .SingleOrDefaultAsync();
         return membersDto;
@@ -127,8 +127,9 @@ public class UserRepository(DataContext context, IMapper mapper): IUserRepositor
 
     public async Task<bool> AddUserAsync(AppUsers user)
     {
-        await context.Users.AddAsync(user);
-        if (await context.Users.SingleOrDefaultAsync(u => u.UserName == user.UserName) 
+        
+        // Check if user with the same username already exists
+        if (await context.Users.SingleOrDefaultAsync(u => user.NormalizedUserName != null && u.NormalizedUserName == user.NormalizedUserName.ToUpper()) 
             is not null)
         {
             return false;

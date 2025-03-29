@@ -1,10 +1,16 @@
-﻿namespace API.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+// ReSharper disable NullableWarningSuppressionIsUsed
+
+namespace API.Entities;
 
 public class Message
 {
     public int Id { get; set; }
+    [MaxLength(30)]
     public required string SenderUsername { get; set; }
+    [MaxLength(30)]
     public required string RecipientUsername { get; set; }
+    [MaxLength(30)]
     public required string Content { get; set; }
     public DateTime? DateRead { get; set; }
     public DateTime? MessageSent { get; set; }=DateTime.Now;

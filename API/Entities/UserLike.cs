@@ -1,4 +1,5 @@
-﻿namespace API.Entities;
+﻿// ReSharper disable NullableWarningSuppressionIsUsed
+namespace API.Entities;
 
 public class UserLike
 {

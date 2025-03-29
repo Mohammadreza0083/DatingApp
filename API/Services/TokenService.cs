@@ -1,4 +1,3 @@
-using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -18,6 +17,10 @@ public class TokenService(IConfiguration configuration) : ITokenServices
             throw new InvalidOperationException("TokenKey must be at least 64 characters long");
 
         SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(tokenKey));
+        if (user.UserName is  null)
+        {
+            throw new ArgumentNullException(nameof(user.UserName), "UserName cannot be null");
+        }
 
         List<Claim> claims =
         [

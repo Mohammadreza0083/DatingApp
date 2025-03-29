@@ -1,4 +1,3 @@
-using System;
 using System.Net;
 using System.Text.Json;
 using API.Errors;
@@ -26,7 +25,7 @@ public class ExceptionMiddleware(
                 ? new ApiException(
                     context.Response.StatusCode,
                     ex.Message,
-                    ex.StackTrace?.ToString()
+                    ex.StackTrace
                 )
                 : new ApiException(context.Response.StatusCode, "Internal Server Error", null);
             JsonSerializerOptions options = new()
