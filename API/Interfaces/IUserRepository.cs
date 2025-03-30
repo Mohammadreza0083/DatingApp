@@ -45,5 +45,5 @@ public interface IUserRepository
     /// <returns>user</returns>
     Task<MembersDto?> GetMemberAsync(string username);
     
-    Task<bool> AddUserAsync(AppUsers user);
+    Task<AppUsers?> AddUserAsync(RegisterDto registerDto);
 }

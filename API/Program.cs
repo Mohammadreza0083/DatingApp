@@ -44,8 +44,9 @@ try
 {
     DataContext context = services.GetRequiredService<DataContext>();
     UserManager<AppUsers> manager = services.GetRequiredService<UserManager<AppUsers>>();
+    RoleManager<AppRole> roleManager = services.GetRequiredService<RoleManager<AppRole>>();
     await context.Database.MigrateAsync();
-    await Seed.SeedUser(manager, new LoggerFactory().CreateLogger<Program>());
+    await Seed.SeedUser(manager, new LoggerFactory().CreateLogger<Program>(), roleManager);
 }
 catch (Exception ex)
 {

@@ -1,14 +1,13 @@
-using System.Security.Cryptography;
 using API.DTO;
 using API.Entities;
 using API.Interfaces;
-using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
 public class AccountController(IUserRepository userRepository, 
-    ITokenServices tokenServices, IMapper mapper)
+    ITokenServices tokenServices,UserManager<AppUsers> userManager)
     : BaseApiController
 {
     [HttpPost("login")]
@@ -17,12 +16,14 @@ public class AccountController(IUserRepository userRepository,
         var user = await userRepository.GetUserByUsernameAsync(loginDto.Username);
         if (user is null || user.UserName is null)
             return Unauthorized("Invalid username");
-        
+        var result = await userManager.CheckPasswordAsync(user, loginDto.Password);
+        if (!result)
+            return Unauthorized("Invalid password");
         return new UserDto
         {
             Username = user.UserName, 
             KnownAs = user.KnownAs,
-            Token = tokenServices.CreateToken(user),
+            Token = await tokenServices.CreateToken(user),
             Gender = user.Gender,
             PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
         };
@@ -31,21 +32,17 @@ public class AccountController(IUserRepository userRepository,
     [HttpPost("register")]
     public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
     {
-        using var hmc = new HMACSHA512();
-        var user = mapper.Map<AppUsers>(registerDto);
-        user.UserName = registerDto.Username.ToLower();
-        
-        if (await userRepository.AddUserAsync(user))
+        var user = await userRepository.AddUserAsync(registerDto);
+        if (user is not  null && user.UserName is not null)
         {
             return new UserDto
             {
                 Username = user.UserName,
                 KnownAs = user.KnownAs,
-                Token = tokenServices.CreateToken(user),
+                Token = await tokenServices.CreateToken(user),
                 Gender = user.Gender
             };
         }
-        
-        return BadRequest("Username is taken");
+        return BadRequest("Something went wrong");
     }
 }

@@ -3,13 +3,14 @@ using System.Security.Claims;
 using System.Text;
 using API.Entities;
 using API.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
 namespace API.Services;
 
-public class TokenService(IConfiguration configuration) : ITokenServices
+public class TokenService(IConfiguration configuration, UserManager<AppUsers> manager) : ITokenServices
 {
-    public string CreateToken(AppUsers user)
+    public async Task<string> CreateToken(AppUsers user)
     {
         string tokenKey = configuration["TokenKey"] ?? throw new InvalidOperationException("TokenKey is missing");
 
@@ -21,13 +22,13 @@ public class TokenService(IConfiguration configuration) : ITokenServices
         {
             throw new ArgumentNullException(nameof(user.UserName), "UserName cannot be null");
         }
-
         List<Claim> claims =
         [
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Name, user.UserName)
         ];
-
+        var roles = await manager.GetRolesAsync(user);
+        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
         SigningCredentials credentials = new(key, SecurityAlgorithms.HmacSha512Signature);
 
         SecurityTokenDescriptor tokenDescriptor = new()

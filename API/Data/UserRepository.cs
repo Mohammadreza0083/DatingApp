@@ -4,11 +4,12 @@ using API.Helpers;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
 
-public class UserRepository(DataContext context, IMapper mapper): IUserRepository
+public class UserRepository(UserManager<AppUsers> manager, DataContext context, IMapper mapper): IUserRepository
 {
     /// <summary>
     /// Unnecessary method
@@ -125,17 +126,26 @@ public class UserRepository(DataContext context, IMapper mapper): IUserRepositor
         return membersDto;
     }
 
-    public async Task<bool> AddUserAsync(AppUsers user)
+    public async Task<AppUsers?> AddUserAsync(RegisterDto registerDto)
     {
         
         // Check if user with the same username already exists
-        if (await context.Users.SingleOrDefaultAsync(u => user.NormalizedUserName != null && u.NormalizedUserName == user.NormalizedUserName.ToUpper()) 
+        if (await context.Users.SingleOrDefaultAsync(u => u.NormalizedUserName == registerDto.Username.ToUpper()) 
             is not null)
         {
-            return false;
+            throw new Exception("Username is taken");
         }
-
-        await context.Users.AddAsync(user);
-        return await context.SaveChangesAsync() > 0;
+        var user = mapper.Map<AppUsers>(registerDto);
+        user.UserName = registerDto.Username.ToLower();
+        var result = await manager.CreateAsync(user, registerDto.Password);
+        if (result.Succeeded)
+        {
+            return user;
+        }
+        foreach (var error in result.Errors)
+        {
+            throw new Exception(error.Description);
+        }
+        return null;
     }
 }
