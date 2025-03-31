@@ -31,6 +31,19 @@ public static class IdentityServiceExtension
                 ValidateIssuer = false,
                 ValidateAudience = false
             };
+            op.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    string? accessToken = context.Request.Query["access_token"];
+                    string path = context.HttpContext.Request.Path;
+                    if (path.StartsWith("/hubs") && !string.IsNullOrEmpty(accessToken))
+                    {
+                        context.Token = accessToken;
+                    }
+                    return Task.CompletedTask;
+                }
+            };
         });
         services.AddAuthorizationBuilder()
             .AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"))
