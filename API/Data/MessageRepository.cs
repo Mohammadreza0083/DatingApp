@@ -20,6 +20,16 @@ public class MessageRepository(DataContext context, IMapper mapper): IMessageRep
         context.Messages.Remove(message);
     }
 
+    public void AddGroup(Group group)
+    {
+        context.Groups.Add(group);
+    }
+
+    public void RemoveConnection(Connection connection)
+    {
+        context.Connections.Remove(connection);
+    }
+
     public async Task<Message?> GetMessageAsync(int id)
     {
         return await context.Messages.FindAsync(id);
@@ -66,5 +76,17 @@ public class MessageRepository(DataContext context, IMapper mapper): IMessageRep
     public async Task<bool> SaveAllChangesAsync()
     {
         return await context.SaveChangesAsync() > 0;
+    }
+
+    public async Task<Group?> GetMessageGroupAsync(string groupName)
+    {
+        return await context.Groups
+            .Include(x=> x.Connections)
+            .FirstOrDefaultAsync(x => x.Name == groupName);
+    }
+
+    public async Task<Connection?> GetConnectionAsync(string connectionId)
+    {
+        return await context.Connections.FindAsync(connectionId);
     }
 }

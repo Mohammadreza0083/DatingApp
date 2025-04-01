@@ -40,6 +40,7 @@ if (app.Environment.IsDevelopment())
 }
 app.MapControllers();
 app.MapHub<PresenceHub>("hubs/presence");
+app.MapHub<MessageHub>("hubs/message");
 using IServiceScope scope = app.Services.CreateScope();
 IServiceProvider services = scope.ServiceProvider;
 try
@@ -48,6 +49,7 @@ try
     UserManager<AppUsers> manager = services.GetRequiredService<UserManager<AppUsers>>();
     RoleManager<AppRole> roleManager = services.GetRequiredService<RoleManager<AppRole>>();
     await context.Database.MigrateAsync();
+    await context.Database.ExecuteSqlRawAsync("DELETE FROM [Connections]");
     await Seed.SeedUser(manager, new LoggerFactory().CreateLogger<Program>(), roleManager);
 }
 catch (Exception ex)
