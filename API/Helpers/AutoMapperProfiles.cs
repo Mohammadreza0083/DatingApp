@@ -27,5 +27,8 @@ public class AutoMapperProfiles : Profile
             .ForMember(d => d.RecipientPhotoUrl, 
                 // ReSharper disable once NullableWarningSuppressionIsUsed
                 o => o.MapFrom(u => u.Recipient.Photos.FirstOrDefault(x => x.IsMain)!.Url));
+        CreateMap<DateTime, DateTime>().ConvertUsing(s => DateTime.SpecifyKind(s, DateTimeKind.Utc));
+        CreateMap<DateTime?, DateTime?>().ConvertUsing(s => s.HasValue 
+            ? DateTime.SpecifyKind(s.Value, DateTimeKind.Utc) : null);
     }
 }

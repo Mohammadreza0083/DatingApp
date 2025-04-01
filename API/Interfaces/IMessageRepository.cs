@@ -16,4 +16,5 @@ public interface IMessageRepository
     Task<bool> SaveAllChangesAsync();
     Task<Group?> GetMessageGroupAsync(string groupName);
     Task<Connection?> GetConnectionAsync(string connectionId);
+    Task<Group?> GetGroupForConnectionAsync(string connectionId);
 }

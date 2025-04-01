@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace API.SignalR;
 
 public class MessageHub(IMessageRepository messageRepository, IUserRepository userRepository,
-    IMapper mapper) : Hub
+    IMapper mapper, IHubContext<PresenceHub> presenceHubContext) : Hub
 {
     public override async Task OnConnectedAsync()
     {
@@ -28,10 +28,11 @@ public class MessageHub(IMessageRepository messageRepository, IUserRepository us
         }
         var groupName = GetGroupName(Context.User.GetUsername(), otherUser);
         await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-        await AddToGroup(groupName);
+        var group =await AddToGroup(groupName);
+        await Clients.Group(groupName).SendAsync("UpdatedGroup", group);
         // ReSharper disable once NullableWarningSuppressionIsUsed
         var messages = await messageRepository.GetMessagesThreadAsync(Context.User.GetUsername(), otherUser!);
-        await Clients.Groups(groupName).SendAsync("ReceiveMessageThread", messages);
+        await Clients.Caller.SendAsync("ReceiveMessageThread", messages);
     }
 
     public async Task SendMessage(CreateMessageDto messageDto)
@@ -62,6 +63,15 @@ public class MessageHub(IMessageRepository messageRepository, IUserRepository us
         {
             message.DateRead = DateTime.UtcNow;
         }
+        else
+        {
+            var connections = await PresenceTracker.GetConnectionsForUser(recipient.UserName);
+            if (connections.Count is not 0)
+            {
+                await presenceHubContext.Clients.Clients(connections).SendAsync("NewMessageReceive", 
+                    new {username = recipient.UserName, message = messageDto.Content});
+            }
+        }
         messageRepository.AddMessage(message);
         if (await messageRepository.SaveAllChangesAsync())
         {
@@ -72,11 +82,12 @@ public class MessageHub(IMessageRepository messageRepository, IUserRepository us
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        await RemoveFromMessageGroup();
+        var group = await RemoveFromMessageGroup();
+        await Clients.Group(group.Name).SendAsync("UpdatedGroup", group);
         await base.OnDisconnectedAsync(exception);
     }
 
-    async Task<bool> AddToGroup(string groupName)
+    async Task<Group> AddToGroup(string groupName)
     {
         var username = Context.User?.GetUsername() ?? throw new HubException("Cannot get current user claim");
         var group = await messageRepository.GetMessageGroupAsync(groupName);
@@ -94,17 +105,22 @@ public class MessageHub(IMessageRepository messageRepository, IUserRepository us
             messageRepository.AddGroup(group);
         }
         group.Connections.Add(connection);
-        return await messageRepository.SaveAllChangesAsync();
+        if(await messageRepository.SaveAllChangesAsync())
+            return group;
+        throw new HubException("Failed to add to group");
     }
 
-    async Task RemoveFromMessageGroup()
+    async Task<Group> RemoveFromMessageGroup()
     {
-        var connection= await messageRepository.GetConnectionAsync(Context.ConnectionId);
-        if (connection is not  null)
+        var group = await messageRepository.GetGroupForConnectionAsync(Context.ConnectionId);
+        var connection= group?.Connections.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);  
+        if (connection is not null && group is not null)
         {
             messageRepository.RemoveConnection(connection);
-            await messageRepository.SaveAllChangesAsync();
+            if(await messageRepository.SaveAllChangesAsync())
+                return group;
         }
+        throw new HubException("Failed to remove from group");
     }
     string GetGroupName(string callerId, string? other)
     {
