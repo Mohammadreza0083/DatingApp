@@ -2,6 +2,7 @@ using API.Data;
 using API.Entities;
 using API.Extensions;
 using API.Middleware;
+using API.SignalR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +26,7 @@ app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors(x =>
     x.AllowAnyHeader()
         .AllowAnyMethod()
+        .AllowCredentials()
         .WithOrigins("http://localhost:4200", "https://localhost:4200")
 );
 
@@ -37,7 +39,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 app.MapControllers();
-
+app.MapHub<PresenceHub>("hubs/presence");
+app.MapHub<MessageHub>("hubs/message");
 using IServiceScope scope = app.Services.CreateScope();
 IServiceProvider services = scope.ServiceProvider;
 try
@@ -46,6 +49,7 @@ try
     UserManager<AppUsers> manager = services.GetRequiredService<UserManager<AppUsers>>();
     RoleManager<AppRole> roleManager = services.GetRequiredService<RoleManager<AppRole>>();
     await context.Database.MigrateAsync();
+    await context.Database.ExecuteSqlRawAsync("DELETE FROM [Connections]");
     await Seed.SeedUser(manager, new LoggerFactory().CreateLogger<Program>(), roleManager);
 }
 catch (Exception ex)
