@@ -37,6 +37,7 @@ public class Seed
         }
         foreach (AppUsers user in users)
         {
+            user.Photos.First().IsApproved = true;
             if(user.UserName is not null)
                 user.UserName = user.UserName.ToLower();
             logger.LogInformation($"Seeding user {user.UserName}");

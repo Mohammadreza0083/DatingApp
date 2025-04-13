@@ -18,6 +18,8 @@ public class Photo
     [MaxLength(10)]
     public string? PublicId { get; set; }
 
+    public bool IsApproved { get; set; } = false;
+
     /// <summary>
     /// Navigation property
     /// </summary>

@@ -33,12 +33,14 @@ public interface IUserRepository
     /// </summary>
     /// <returns>list of users</returns>
     Task<PagedList<MembersDto>> GetAllMembersAsync(UserParams userParams);
+
     /// <summary>
     /// Get user by username **Async Method** 
     /// </summary>
     /// <param name="username"></param>
+    /// <param name="isCurrentUser"></param>
     /// <returns>user</returns>
-    Task<MembersDto?> GetMemberAsync(string username);
+    Task<MembersDto?> GetMemberAsync(string username, bool isCurrentUser);
     
     Task<AppUsers?> AddUserAsync(RegisterDto registerDto);
 }

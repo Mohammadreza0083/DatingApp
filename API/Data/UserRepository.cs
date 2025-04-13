@@ -106,14 +106,19 @@ public class UserRepository(UserManager<AppUsers> manager, DataContext context, 
     /// Map user to MembersDto 
     /// </summary>
     /// <param name="username"></param>
+    /// <param name="isCurrentUser"></param>
     /// <returns>MemberDto or Null</returns>
-    public async Task<MembersDto?> GetMemberAsync(string username)
+    public async Task<MembersDto?> GetMemberAsync(string username, bool isCurrentUser)
     {
-        MembersDto? membersDto = await context.Users
+        var query= context.Users
             .Where(u => u.NormalizedUserName == username.ToUpper())
             .ProjectTo<MembersDto>(mapper.ConfigurationProvider)
-            .SingleOrDefaultAsync();
-        return membersDto;
+            .AsQueryable();
+        if (isCurrentUser)
+        {
+            query = query.IgnoreQueryFilters();
+        }
+        return await query.SingleOrDefaultAsync();
     }
 
     public async Task<AppUsers?> AddUserAsync(RegisterDto registerDto)
