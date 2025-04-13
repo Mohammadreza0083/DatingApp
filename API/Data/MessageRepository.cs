@@ -54,21 +54,22 @@ public class MessageRepository(DataContext context, IMapper mapper): IMessageRep
     public async Task<IEnumerable<MessageDto>> GetMessagesThreadAsync
         (string currentUsername, string recipientUsername)
     {
-        var messages = await context.Messages
+        var query = context.Messages
             .Where(
-                x => x.RecipientUsername == currentUsername && x.RecipientDeleted == false && x.SenderUsername == recipientUsername
-                     || x.RecipientUsername == recipientUsername && x.SenderUsername == currentUsername && x.SenderDeleted == false)
+                x => x.RecipientUsername == currentUsername && x.RecipientDeleted == false &&
+                     x.SenderUsername == recipientUsername
+                     || x.RecipientUsername == recipientUsername && x.SenderUsername == currentUsername &&
+                     x.SenderDeleted == false)
             .OrderBy(m => m.MessageSent)
-            .ProjectTo<MessageDto>(mapper.ConfigurationProvider)
-            .ToListAsync();
-        var unreadMessages = messages.Where(m => m.DateRead == null && 
+            .AsQueryable();
+        var unreadMessages = query.Where(m => m.DateRead == null && 
                                                  m.RecipientUsername == currentUsername).ToList();
         if (unreadMessages.Count is not 0)
         {
             unreadMessages.ForEach(x => x.DateRead = DateTime.UtcNow);
         }
 
-        return messages;
+        return await query.ProjectTo<MessageDto>(mapper.ConfigurationProvider).ToListAsync();
     }
 
     public async Task<Group?> GetMessageGroupAsync(string groupName)
