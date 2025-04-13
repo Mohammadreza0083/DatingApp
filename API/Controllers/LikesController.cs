@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-public class LikesController(ILikesRepository repo) : BaseApiController
+public class LikesController(IUnitOfWork repo) : BaseApiController
 {
     [HttpPost("{targetUserId:int}")]
 
@@ -20,7 +20,7 @@ public class LikesController(ILikesRepository repo) : BaseApiController
             return BadRequest("You cannot like yourself");
         }
         
-        var existingLike = await repo.GetUserLikeAsync(sourceUserId, targetUserId);
+        var existingLike = await repo.LikesRepository.GetUserLikeAsync(sourceUserId, targetUserId);
 
         if (existingLike is null)
         {
@@ -30,14 +30,14 @@ public class LikesController(ILikesRepository repo) : BaseApiController
                 TargetUserId = targetUserId
             };
             
-            repo.AddUserLike(like);
+            repo.LikesRepository.AddUserLike(like);
         }
         else
         {
-            repo.DeleteUserLike(existingLike);
+            repo.LikesRepository.DeleteUserLike(existingLike);
         }
 
-        if (await repo.SaveChangesAsync())
+        if (await repo.Complete())
         {
             return Ok();
         }
@@ -49,7 +49,7 @@ public class LikesController(ILikesRepository repo) : BaseApiController
     public async Task<ActionResult<IEnumerable<int>>> GetCurrentUserLikeIds()
     {
         return Ok(
-            await repo.GetCurrentUserLikeIdsAsync(User.GetUserId()));
+            await repo.LikesRepository.GetCurrentUserLikeIdsAsync(User.GetUserId()));
     }
 
     [HttpGet]
@@ -57,7 +57,7 @@ public class LikesController(ILikesRepository repo) : BaseApiController
     {
         likesParams.UserId = User.GetUserId();
         
-        var users = await repo.GetUserLikesAsync(likesParams);
+        var users = await repo.LikesRepository.GetUserLikesAsync(likesParams);
         
         Response.AddPaginationHeader(users);
         

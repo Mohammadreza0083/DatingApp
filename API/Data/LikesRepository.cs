@@ -56,11 +56,6 @@ public class LikesRepository(DataContext context, IMapper mapper) : ILikesReposi
             .ToListAsync();
     }
 
-    public async Task<bool> SaveChangesAsync()
-    {
-        return await context.SaveChangesAsync() > 0;
-    }
-
     public void DeleteUserLike(UserLike userLike)
     {
         context.Likes.Remove(userLike);

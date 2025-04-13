@@ -12,11 +12,6 @@ public interface IUserRepository
     /// <param name="user"></param>
     void Update(AppUsers user);
     /// <summary>
-    /// Save all changes **Async Method** 
-    /// </summary>
-    /// <returns>true if anything change and false if nothing change</returns>
-    Task<bool> SaveAllAsync();
-    /// <summary>
     /// Get a list of all users **Async Method**
     /// </summary>
     /// <returns>A IEnumerable list of Users</returns>

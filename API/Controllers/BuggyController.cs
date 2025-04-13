@@ -1,11 +1,11 @@
-using API.Data;
 using API.Entities;
+using API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-public class BuggyController(DataContext context) : BaseApiController
+public class BuggyController(IUnitOfWork repo) : BaseApiController
 {
     [Authorize]
     [HttpGet("auth")]
@@ -15,18 +15,19 @@ public class BuggyController(DataContext context) : BaseApiController
     }
 
     [HttpGet("not-found")]
-    public ActionResult<AppUsers> GetNotFound()
+    public async Task<ActionResult<AppUsers>> GetNotFound()
     {
-        AppUsers? user = context.Users.Find(-1);
+        AppUsers? user = await repo.UserRepository.GetUserByIdAsync(-1);
         if (user is null)
             return NotFound();
         return user;
     }
 
     [HttpGet("server-error")]
-    public ActionResult<AppUsers> GetServerError()
+    public async Task<ActionResult<AppUsers>> GetServerError()
     {
-        AppUsers user = context.Users.Find(-1) ?? throw new Exception("Some server error");
+        AppUsers user = await repo.UserRepository.GetUserByIdAsync(-1) 
+                        ?? throw new Exception("Some server error");
         return user;
     }
 

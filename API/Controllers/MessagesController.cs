@@ -9,8 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 [Authorize]
-public class MessagesController(IMessageRepository messageRepo, IUserRepository userRepo,
-    IMapper mapper) : BaseApiController
+public class MessagesController(IUnitOfWork repo, IMapper mapper) : BaseApiController
 {
     [HttpPost]
     public async Task<ActionResult<MessageDto>> CreateMessageAsync(CreateMessageDto createMessageDto)
@@ -20,8 +19,8 @@ public class MessagesController(IMessageRepository messageRepo, IUserRepository 
         {
             return BadRequest("You cannot send messages to yourself");
         }
-        var sender = await userRepo.GetUserByUsernameAsync(username);
-        var recipient = await userRepo.GetUserByUsernameAsync(createMessageDto.RecipientUsername);
+        var sender = await repo.UserRepository.GetUserByUsernameAsync(username);
+        var recipient = await repo.UserRepository.GetUserByUsernameAsync(createMessageDto.RecipientUsername);
         if (recipient is null || sender?.UserName is null || recipient.UserName is null)
         {
             return BadRequest("User not found");
@@ -34,8 +33,8 @@ public class MessagesController(IMessageRepository messageRepo, IUserRepository 
             RecipientUsername = recipient.UserName,
             Content = createMessageDto.Content
         };
-        messageRepo.AddMessage(message);
-        if (await messageRepo.SaveAllChangesAsync())
+        repo.MessageRepository.AddMessage(message);
+        if (await repo.Complete())
         {
             return Ok(mapper.Map<MessageDto>(message));
         }
@@ -47,7 +46,7 @@ public class MessagesController(IMessageRepository messageRepo, IUserRepository 
         [FromQuery]MessageParams messageParams)
     {
         messageParams.Username = User.GetUsername();
-        var messages = await messageRepo.GetMessagesForUserAsync(messageParams);
+        var messages = await repo.MessageRepository.GetMessagesForUserAsync(messageParams);
         Response.AddPaginationHeader(messages);
         return messages;
     }
@@ -57,14 +56,14 @@ public class MessagesController(IMessageRepository messageRepo, IUserRepository 
     {
         var currentUserUsername = User.GetUsername();
         
-        return Ok(await messageRepo.GetMessagesThreadAsync(currentUserUsername, username));
+        return Ok(await repo.MessageRepository.GetMessagesThreadAsync(currentUserUsername, username));
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteMessageAsync(int id)
     {
         var currentUserUsername = User.GetUsername();
-        var message = await messageRepo.GetMessageAsync(id);
+        var message = await repo.MessageRepository.GetMessageAsync(id);
         if (message is null)
         {
             return BadRequest("Message not found");
@@ -86,10 +85,10 @@ public class MessagesController(IMessageRepository messageRepo, IUserRepository 
 
         if (message is {SenderDeleted:true, RecipientDeleted:true})
         {
-            messageRepo.DeleteMessage(message);
+            repo.MessageRepository.DeleteMessage(message);
         }
         
-        if (await messageRepo.SaveAllChangesAsync())
+        if (await repo.Complete())
         {
             return Ok();
         }

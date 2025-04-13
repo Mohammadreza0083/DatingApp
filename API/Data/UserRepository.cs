@@ -20,16 +20,6 @@ public class UserRepository(UserManager<AppUsers> manager, DataContext context, 
     {
         context.Entry(user).State = EntityState.Modified;
     }
-
-    /// <summary>
-    /// Save all changes in DB
-    /// </summary>
-    /// <returns>1(true) if anything change in DB and 0(false) if nothing change in DB</returns>
-    public async Task<bool> SaveAllAsync()
-    {
-        return await context.SaveChangesAsync() > 0;
-    }
-
     /// <summary>
     /// Get all user in database
     /// Include users photo because EntityFramework is lazy and cant find users photo
