@@ -13,6 +13,7 @@ public class Group
     /// Serves as the primary key
     /// </summary>
     [Key]
+    [MaxLength(50)]
     public required string Name { get; set; }
 
     /// <summary>

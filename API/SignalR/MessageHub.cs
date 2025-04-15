@@ -43,6 +43,7 @@ public class MessageHub(IUnitOfWork repo, IMapper mapper, IHubContext<PresenceHu
         await Clients.Group(groupName).SendAsync("UpdatedGroup", group);
 
         // Get and send message thread
+        // ReSharper disable once NullableWarningSuppressionIsUsed
         var messages = await repo.MessageRepository.GetMessagesThreadAsync(Context.User.GetUsername(), otherUser!);
         if (repo.HasChanges())
         {

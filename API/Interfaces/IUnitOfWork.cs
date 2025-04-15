@@ -1,6 +1,4 @@
-﻿using API.Data;
-
-namespace API.Interfaces;
+﻿namespace API.Interfaces;
 
 /// <summary>
 /// Interface for the Unit of Work pattern, providing access to repositories and transaction management
