@@ -9,22 +9,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
 
+/// <summary>
+/// Repository for managing user-related operations
+/// Implements IUserRepository interface
+/// </summary>
 public class UserRepository(UserManager<AppUsers> manager, DataContext context, IMapper mapper): IUserRepository
 {
     /// <summary>
-    /// Unnecessary method
-    /// EntityFramework flow data if anything change
+    /// Updates the state of a user entity in the database
+    /// Note: This method is unnecessary as Entity Framework automatically tracks changes
     /// </summary>
-    /// <param name="user"></param>
+    /// <param name="user">The user entity to update</param>
     public void Update(AppUsers user)
     {
         context.Entry(user).State = EntityState.Modified;
     }
+
     /// <summary>
-    /// Get all user in database
-    /// Include users photo because EntityFramework is lazy and cant find users photo
+    /// Retrieves all users from the database
+    /// Includes user photos to handle Entity Framework lazy loading
     /// </summary>
-    /// <returns>A IEnumerable list of users in database</returns>
+    /// <returns>An IEnumerable collection of users</returns>
     public async Task<IEnumerable<AppUsers>> GetUsersAsync()
     {
         List<AppUsers> users = await context.Users
@@ -34,16 +39,12 @@ public class UserRepository(UserManager<AppUsers> manager, DataContext context, 
     }
 
     /// <summary>
-    /// Find user by id
-    /// use Linq (FirstOrDefaultAsync)
-    /// Include user photo because EntityFramework is lazy and cant find user photo
-    /// Async Method
+    /// Retrieves a user by their ID
+    /// Uses Entity Framework's FirstOrDefaultAsync for efficient querying
+    /// Includes user photos to handle Entity Framework lazy loading
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns>
-    /// User is find
-    /// Null is user notfound
-    /// </returns>
+    /// <param name="id">The ID of the user to find</param>
+    /// <returns>The user if found, null otherwise</returns>
     public async Task<AppUsers?> GetUserByIdAsync(int id)
     {
         AppUsers? user = await context.Users
@@ -53,16 +54,12 @@ public class UserRepository(UserManager<AppUsers> manager, DataContext context, 
     }
 
     /// <summary>
-    /// Find user by username
-    /// Use Linq (SingleOrDefaultAsync) we have unique username in DB
-    /// Include user photo because EntityFramework is lazy and cant find user photo
-    /// Async Method
+    /// Retrieves a user by their username
+    /// Uses Entity Framework's SingleOrDefaultAsync as usernames are unique
+    /// Includes user photos to handle Entity Framework lazy loading
     /// </summary>
-    /// <param name="username"></param>
-    /// <returns>
-    /// User if found
-    /// Null if notfound
-    /// </returns>
+    /// <param name="username">The username to search for</param>
+    /// <returns>The user if found, null otherwise</returns>
     public async Task<AppUsers?> GetUserByUsernameAsync(string username)
     {
         AppUsers? user = await context.Users
@@ -72,9 +69,11 @@ public class UserRepository(UserManager<AppUsers> manager, DataContext context, 
     }
 
     /// <summary>
-    /// Map users to members
+    /// Retrieves a paginated list of members based on specified parameters
+    /// Applies filtering based on gender, age range, and sorting preferences
     /// </summary>
-    /// <returns>list of MemberDto or Null</returns>
+    /// <param name="userParams">Parameters for filtering and pagination</param>
+    /// <returns>A paginated list of MemberDto objects</returns>
     public async Task<PagedList<MembersDto>> GetAllMembersAsync(UserParams userParams)
     {
         var query = context.Users.AsQueryable();
@@ -103,11 +102,12 @@ public class UserRepository(UserManager<AppUsers> manager, DataContext context, 
     }
 
     /// <summary>
-    /// Map user to MembersDto 
+    /// Retrieves a member by username and maps to MemberDto
+    /// Optionally ignores query filters for the current user
     /// </summary>
-    /// <param name="username"></param>
-    /// <param name="isCurrentUser"></param>
-    /// <returns>MemberDto or Null</returns>
+    /// <param name="username">The username to search for</param>
+    /// <param name="isCurrentUser">Whether the requested user is the current user</param>
+    /// <returns>The mapped MemberDto if found, null otherwise</returns>
     public async Task<MembersDto?> GetMemberAsync(string username, bool isCurrentUser)
     {
         var query= context.Users
@@ -121,10 +121,15 @@ public class UserRepository(UserManager<AppUsers> manager, DataContext context, 
         return await query.SingleOrDefaultAsync();
     }
 
+    /// <summary>
+    /// Adds a new user to the database
+    /// Validates username uniqueness and creates user with provided credentials
+    /// </summary>
+    /// <param name="registerDto">The registration data for the new user</param>
+    /// <returns>The created user if successful, null otherwise</returns>
+    /// <exception cref="Exception">Thrown if username is taken or user creation fails</exception>
     public async Task<AppUsers?> AddUserAsync(RegisterDto registerDto)
     {
-        
-        // Check if user with the same username already exists
         if (await context.Users.SingleOrDefaultAsync(u => u.NormalizedUserName == registerDto.Username.ToUpper()) 
             is not null)
         {
@@ -144,6 +149,12 @@ public class UserRepository(UserManager<AppUsers> manager, DataContext context, 
         return null;
     }
 
+    /// <summary>
+    /// Retrieves a user by their photo ID
+    /// Includes user photos and ignores query filters
+    /// </summary>
+    /// <param name="photoId">The ID of the photo to search for</param>
+    /// <returns>The user who owns the photo if found, null otherwise</returns>
     public async Task<AppUsers?> GetUserByPhotoIdAsync(int photoId)
     {
         return await context.Users

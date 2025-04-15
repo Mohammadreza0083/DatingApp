@@ -7,11 +7,21 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace API.Extensions;
 
+/// <summary>
+/// Extension methods for configuring identity services
+/// </summary>
 public static class IdentityServiceExtension
 {
+    /// <summary>
+    /// Adds and configures identity services including authentication and authorization
+    /// </summary>
+    /// <param name="services">The service collection to add services to</param>
+    /// <param name="configuration">The application configuration</param>
+    /// <returns>The service collection with added identity services</returns>
     public static IServiceCollection AddIdentityServices
         (this IServiceCollection services, IConfiguration configuration)
     {
+        // Configure identity core with custom user type and password requirements
         services.AddIdentityCore<AppUsers>(op =>
             {
                 op.Password.RequireDigit = true;
@@ -20,6 +30,7 @@ public static class IdentityServiceExtension
             .AddRoleManager<RoleManager<AppRole>>()
             .AddEntityFrameworkStores<DataContext>();
         
+        // Configure JWT authentication
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(op =>
         {
@@ -31,6 +42,7 @@ public static class IdentityServiceExtension
                 ValidateIssuer = false,
                 ValidateAudience = false
             };
+            // Configure token handling for SignalR hubs
             op.Events = new JwtBearerEvents
             {
                 OnMessageReceived = context =>
@@ -45,6 +57,8 @@ public static class IdentityServiceExtension
                 }
             };
         });
+
+        // Configure authorization policies
         services.AddAuthorizationBuilder()
             .AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"))
             .AddPolicy("ModeratorPhotoRole", policy => policy.RequireRole("Moderator", "Admin"));

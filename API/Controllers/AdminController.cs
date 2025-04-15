@@ -7,9 +7,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
+/// <summary>
+/// Controller for administrative operations
+/// Handles user role management and photo moderation
+/// </summary>
 public class AdminController(UserManager<AppUsers> userManager, 
     IUnitOfWork repo, IPhotoServices photoServices) : BaseApiController
 {
+    /// <summary>
+    /// Retrieves all users with their assigned roles
+    /// Requires admin role
+    /// </summary>
+    /// <returns>List of users with their roles</returns>
     [Authorize(Policy = "RequireAdminRole")]
     [HttpGet("users-with-roles")]
     public async Task<ActionResult> GetUsersWithRole()
@@ -25,6 +34,14 @@ public class AdminController(UserManager<AppUsers> userManager,
             .ToListAsync();
         return Ok(users);
     }
+
+    /// <summary>
+    /// Updates the roles assigned to a user
+    /// Requires admin role
+    /// </summary>
+    /// <param name="username">Username of the user to update</param>
+    /// <param name="roles">Comma-separated list of roles to assign</param>
+    /// <returns>Updated list of user roles</returns>
     [Authorize(Policy = "RequireAdminRole")]
     [HttpPost("edit-roles/{username}")]
     public async Task<ActionResult> EditRoles(string username, string roles)
@@ -52,6 +69,12 @@ public class AdminController(UserManager<AppUsers> userManager,
         }
         return Ok(await userManager.GetRolesAsync(user));
     }
+
+    /// <summary>
+    /// Retrieves photos pending moderation
+    /// Requires moderator role
+    /// </summary>
+    /// <returns>List of unapproved photos</returns>
     [Authorize(Policy = "ModeratorPhotoRole")]
     [HttpGet("photos-to-moderate")]
     public async Task<ActionResult> GetPhotosForModeration()
@@ -59,6 +82,13 @@ public class AdminController(UserManager<AppUsers> userManager,
         var photos = await repo.PhotoRepository.GetUnapprovedPhotosAsync();
         return Ok(photos);
     }
+
+    /// <summary>
+    /// Approves a photo for display
+    /// Requires moderator role
+    /// </summary>
+    /// <param name="photoId">ID of the photo to approve</param>
+    /// <returns>NoContent if successful, BadRequest if failed</returns>
     [Authorize(Policy = "ModeratorPhotoRole")]
     [HttpPost("approve-photo/{photoId}")]
     public async Task<ActionResult> ApprovePhoto(int photoId)
@@ -85,6 +115,13 @@ public class AdminController(UserManager<AppUsers> userManager,
         }
         return BadRequest("Failed to approve photo");
     }
+
+    /// <summary>
+    /// Rejects a photo and removes it from storage
+    /// Requires moderator role
+    /// </summary>
+    /// <param name="photoId">ID of the photo to reject</param>
+    /// <returns>NoContent if successful, BadRequest if failed</returns>
     [Authorize(Policy = "ModeratorPhotoRole")]
     [HttpPost("reject-photo/{photoId}")]
     public async Task<ActionResult> RejectPhoto(int photoId)
