@@ -17,7 +17,7 @@ builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
 
 // Configure OpenAPI/Swagger for API documentation
-builder.Services.AddOpenApi();
+SwaggerServiceExtensions.AddOpenApi(builder.Services);
 
 // Set the application URL for HTTPS
 builder.WebHost.UseUrls("https://localhost:5001");
@@ -35,7 +35,8 @@ app.UseCors(x =>
     x.AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials()
-        .WithOrigins("http://localhost:4200", "https://localhost:4200")
+        .WithOrigins("http://localhost:4200", "https://localhost:4200", 
+            "https://localhost:5001", "https://localhost:5000")
 );
 
 // Add authentication and authorization middleware
@@ -45,6 +46,11 @@ app.UseAuthorization();
 // Configure OpenAPI/Swagger UI in development environment
 if (app.Environment.IsDevelopment())
 {
+    app.UseSwagger();
+    app.UseSwaggerUI(opt =>
+    {
+        opt.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
+    });
     app.MapOpenApi();
 }
 
