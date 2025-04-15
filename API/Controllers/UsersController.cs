@@ -72,12 +72,6 @@ namespace API.Controllers
                 Url = result.Result.SecureUrl.AbsoluteUri,
                 PublicId = result.Result.PublicId
             };
-            
-            if (user.Photos.Count is 0)
-            {
-                photo.IsMain = true;
-            }
-            
             user.Photos.Add(photo);
 
             if (await repo.Complete())
@@ -125,7 +119,7 @@ namespace API.Controllers
             {
                 return BadRequest("No user found");
             }
-            var photo = user.Photos.FirstOrDefault(x => x.Id == photoId);
+            var photo = await repo.PhotoRepository.GetPhotoByIdAsync(photoId);
             var photos = user.Photos;
             if (photo is null)
             {
@@ -140,7 +134,6 @@ namespace API.Controllers
                     photos.FirstOrDefault()!.IsMain = true;
                 }
             }
-
             if (photo.PublicId is not null)
             {
                 var result = photoServices.DeletePhotoAsync(photo.PublicId);
@@ -152,7 +145,7 @@ namespace API.Controllers
             user.Photos.Remove(photo);
             if (await repo.Complete())
             {
-                return Ok();
+                return NoContent();
             }
             return BadRequest("Failed to delete photo");
         }

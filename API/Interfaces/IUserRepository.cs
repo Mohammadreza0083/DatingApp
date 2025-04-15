@@ -43,4 +43,6 @@ public interface IUserRepository
     Task<MembersDto?> GetMemberAsync(string username, bool isCurrentUser);
     
     Task<AppUsers?> AddUserAsync(RegisterDto registerDto);
+    
+    Task<AppUsers?> GetUserByPhotoIdAsync(int photoId);
 }

@@ -143,4 +143,13 @@ public class UserRepository(UserManager<AppUsers> manager, DataContext context, 
         }
         return null;
     }
+
+    public async Task<AppUsers?> GetUserByPhotoIdAsync(int photoId)
+    {
+        return await context.Users
+            .Include(p => p.Photos)
+            .IgnoreQueryFilters()
+            .Where(u => u.Photos.Any(p => p.Id == photoId))
+            .SingleOrDefaultAsync();
+    }
 }
