@@ -24,58 +24,58 @@ export class MembersService {
         params = params.append('pageSize', pageSize);
     }
 
-        return this.http.get<member[]>(this.baseUrl + 'users' ,{observe:'respons', params}).subscribe(members => {
-            next: response => }
+        return.this.http.get<member[]>(this.baseUrl + 'users' ,{observe:'respons', params}).subscribe(members => {
+            next: response => {
             this.paginatedResult.set({
-                items: response.body as Member[],
-                pagination: JSON.parse(Response.headers.get('pagination')!)
+                items: response.body as member[],
+                pagination: JSON.parse(response.headers.get('pagination')!)
 
             })
         });
     }
 
     getMember(username: string) {
-       /*  const SelectedMember = this.members().find(m => m.username === username);
-        if (SelectedMember!=undefined) return of(SelectedMember); */
+       //  const SelectedMember = this.members().find(m => m.username === username);
+        //if (SelectedMember!=undefined) return of(SelectedMember); */
         return this.http.get<member>(this.baseUrl + 'users/' + username);
     }
 
     updateMember(member: member){
         return this.http.put(this.baseUrl + 'users', member).pipe(
-           /*  tap(()=>{
-                this.members.update(members=>members.map(
-                    m=>m.username===member.username?member:m
-                ))
-            }) */
+           //  tap(()=>{
+            //    this.members.update(members=>members.map(
+             //       m=>m.username===member.username?member:m
+             //   ))
+          //  }) 
         );
     }
 
     setMainPhoto(photo: photo){
         return this.http.put(this.baseUrl + 'users/set-main-photo/' + photo.id, {}).pipe(
-           /*  tap(()=>{
-                this.members.update(members=>members.map(
-                    m=>{
-                        if (m.photos.includes(photo)){
-                            m.photoUrl = photo.url;
-                        }
-                        return m;
-                    }
-                )) */
-            /* })); */
+           //  tap(()=>{
+             //   this.members.update(members=>members.map(
+              //      m=>{
+              //          if (m.photos.includes(photo)){
+              //              m.photoUrl = photo.url;
+              //          }
+               //         return m;
+               //     }
+             //  )) 
+            // })); 
     }
 
     deletePhoto(photo: photo){
         return this.http.delete(this.baseUrl + 'users/delete-photo/' + photo.id).pipe(
-            /* tap(()=>{
-                this.members.update(members=>members.map(
-                    m=>{
-                        if (m.photos.includes(photo)){
-                            m.photos = m.photos.filter(p=>p.id!==photo.id);
-                            m.photoUrl = photo.url;
-                        }
-                        return m;
-                    }
-                ))
-            })); */
-    }
+            // tap(()=>{
+             //   this.members.update(members=>members.map(
+             //       m=>{
+               //         if (m.photos.includes(photo)){
+               //             m.photos = m.photos.filter(p=>p.id!==photo.id);
+               //             m.photoUrl = photo.url;
+                //        }
+               //         return m;
+                //    }
+            //    ))
+          //  }));
+ //   }
 }
