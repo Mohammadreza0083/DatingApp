@@ -5,3 +5,26 @@
         </div>
     }
 </div>
+
+
+@if (membersService.paginatedResult()?.pagination){
+  
+    <div class="d-flex justify-content-center">
+
+        <pagination 
+           [boundarylink]="true" 
+             [totalItems]=" membersService.paginatedResult().pagination!.totalItems"
+             [itemsPerpage]="membersService.paginatedResult()?.pagination!.itemsPerpage"
+             [pageChanged]="pageChanged($event)"
+             [maxSize]="10"
+               previousText="&lsaquo;"
+                 nextText="&rsaquo;"
+                   firstText="&laquo;"
+                        lastText="&raquo;">
+    
+    </pagination> 
+    </div>
+}
+
+
+
