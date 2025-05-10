@@ -4,41 +4,63 @@ using API.Helpers;
 
 namespace API.Interfaces;
 
+/// <summary>
+/// Interface for managing user data and operations
+/// </summary>
 public interface IUserRepository
 {
     /// <summary>
-    /// Update user entity data
+    /// Updates a user entity in the repository
     /// </summary>
-    /// <param name="user"></param>
+    /// <param name="user">The user entity to update</param>
     void Update(AppUsers user);
+
     /// <summary>
-    /// Get a list of all users **Async Method**
+    /// Gets all users from the repository
     /// </summary>
-    /// <returns>A IEnumerable list of Users</returns>
+    /// <returns>A list of all users</returns>
     Task<IEnumerable<AppUsers>> GetUsersAsync();
+
     /// <summary>
-    /// Get a user by id **Async Method**
+    /// Gets a user by their ID
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns>User or Null</returns>
+    /// <param name="id">The ID of the user to retrieve</param>
+    /// <returns>The user if found, null otherwise</returns>
     Task<AppUsers?> GetUserByIdAsync(int id);
+
     /// <summary>
-    /// Get a user by username **Async Method**
+    /// Gets a user by their username
     /// </summary>
-    /// <param name="username"></param>
-    /// <returns>User or Null</returns>
+    /// <param name="username">The username of the user to retrieve</param>
+    /// <returns>The user if found, null otherwise</returns>
     Task<AppUsers?> GetUserByUsernameAsync(string username);
+
     /// <summary>
-    /// Get a list of users **Async Method**
+    /// Gets a paginated list of member DTOs
     /// </summary>
-    /// <returns>list of users</returns>
+    /// <param name="userParams">Parameters for filtering and pagination</param>
+    /// <returns>A paginated list of member DTOs</returns>
     Task<PagedList<MembersDto>> GetAllMembersAsync(UserParams userParams);
+
     /// <summary>
-    /// Get user by username **Async Method** 
+    /// Gets a member DTO by username
     /// </summary>
-    /// <param name="username"></param>
-    /// <returns>user</returns>
-    Task<MembersDto?> GetMemberAsync(string username);
+    /// <param name="username">The username of the member to retrieve</param>
+    /// <param name="isCurrentUser">Whether the requested member is the current user</param>
+    /// <returns>The member DTO if found, null otherwise</returns>
+    Task<MembersDto?> GetMemberAsync(string username, bool isCurrentUser);
     
+    /// <summary>
+    /// Adds a new user to the repository
+    /// </summary>
+    /// <param name="registerDto">The registration data for the new user</param>
+    /// <returns>The created user if successful, null otherwise</returns>
     Task<AppUsers?> AddUserAsync(RegisterDto registerDto);
+    
+    /// <summary>
+    /// Gets a user by their photo ID
+    /// </summary>
+    /// <param name="photoId">The ID of the photo</param>
+    /// <returns>The user if found, null otherwise</returns>
+    Task<AppUsers?> GetUserByPhotoIdAsync(int photoId);
 }

@@ -6,10 +6,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
+/// <summary>
+/// Controller for handling user authentication and registration
+/// Manages user login, registration, and token generation
+/// </summary>
 public class AccountController(IUserRepository userRepository, 
     ITokenServices tokenServices,UserManager<AppUsers> userManager)
     : BaseApiController
 {
+    /// <summary>
+    /// Authenticates a user and generates a JWT token
+    /// </summary>
+    /// <param name="loginDto">User credentials (username and password)</param>
+    /// <returns>User DTO with token if successful, Unauthorized if credentials are invalid</returns>
     [HttpPost("login")]
     public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
     {
@@ -29,6 +38,11 @@ public class AccountController(IUserRepository userRepository,
         };
     }
 
+    /// <summary>
+    /// Registers a new user in the system
+    /// </summary>
+    /// <param name="registerDto">User registration information</param>
+    /// <returns>User DTO with token if successful, BadRequest if registration fails</returns>
     [HttpPost("register")]
     public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
     {

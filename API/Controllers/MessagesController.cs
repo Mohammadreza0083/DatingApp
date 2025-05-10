@@ -8,9 +8,19 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
+
+/// <summary>
+/// Controller for managing user messages
+/// Handles message creation, retrieval, and deletion
+/// </summary>
 [Authorize]
 public class MessagesController(IUnitOfWork repo, IMapper mapper) : BaseApiController
 {
+    /// <summary>
+    /// Creates a new message between two users
+    /// </summary>
+    /// <param name="createMessageDto">Message content and recipient information</param>
+    /// <returns>Created message DTO if successful, BadRequest if failed</returns>
     [HttpPost]
     public async Task<ActionResult<MessageDto>> CreateMessageAsync(CreateMessageDto createMessageDto)
     {
@@ -41,6 +51,11 @@ public class MessagesController(IUnitOfWork repo, IMapper mapper) : BaseApiContr
         return BadRequest("Failed to send message");
     }
 
+    /// <summary>
+    /// Retrieves paginated messages for the current user
+    /// </summary>
+    /// <param name="messageParams">Pagination and filtering parameters</param>
+    /// <returns>List of message DTOs with pagination information</returns>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<MessageDto>>> GetMessagesForUserAsync(
         [FromQuery]MessageParams messageParams)
@@ -51,6 +66,11 @@ public class MessagesController(IUnitOfWork repo, IMapper mapper) : BaseApiContr
         return messages;
     }
 
+    /// <summary>
+    /// Retrieves the message thread between the current user and another user
+    /// </summary>
+    /// <param name="username">Username of the other participant</param>
+    /// <returns>List of message DTOs in the conversation thread</returns>
     [HttpGet("thread/{username}")]
     public async Task<ActionResult<IEnumerable<MessageDto>>> GetMessagesThreadAsync(string username)
     {
@@ -59,6 +79,12 @@ public class MessagesController(IUnitOfWork repo, IMapper mapper) : BaseApiContr
         return Ok(await repo.MessageRepository.GetMessagesThreadAsync(currentUserUsername, username));
     }
 
+    /// <summary>
+    /// Deletes a message for the current user
+    /// Messages are only physically deleted when both sender and recipient have deleted them
+    /// </summary>
+    /// <param name="id">ID of the message to delete</param>
+    /// <returns>Ok if successful, BadRequest if failed</returns>
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteMessageAsync(int id)
     {

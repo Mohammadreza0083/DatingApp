@@ -5,8 +5,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
 
+/// <summary>
+/// Class for seeding initial data into the database
+/// </summary>
 public class Seed
 {
+    /// <summary>
+    /// Seeds the database with initial user data
+    /// Creates default roles and users including an admin user
+    /// </summary>
+    /// <param name="manager">UserManager instance for managing users</param>
+    /// <param name="logger">ILogger instance for logging seeding progress</param>
+    /// <param name="roleManager">RoleManager instance for managing roles</param>
+    /// <returns>A Task representing the asynchronous operation</returns>
     public static async Task SeedUser(UserManager<AppUsers> manager, ILogger logger, RoleManager<AppRole> roleManager)
     {
         if (await manager.Users.AnyAsync())
@@ -37,6 +48,7 @@ public class Seed
         }
         foreach (AppUsers user in users)
         {
+            user.Photos.First().IsApproved = true;
             if(user.UserName is not null)
                 user.UserName = user.UserName.ToLower();
             logger.LogInformation($"Seeding user {user.UserName}");

@@ -1,99 +1,129 @@
-DatingApp ❤️
-DatingApp is a full-stack web application designed to connect users and help them find meaningful relationships 💕. This project was built as part of a Udemy course and demonstrates modern web development practices using ASP.NET Core, C#, and a TypeScript-based client. The app includes essential features such as user authentication, profile management, and (optionally) matching algorithms.
+# DatingApp ❤️
 
-Table of Contents 📚
-Features
-Technologies Used
-Installation
-Prerequisites
-Backend Setup
-Frontend Setup
-Configuration
-Usage
-Course Details
-Contributing
-License
-Acknowledgments
-Features ✨
-User Registration & Authentication 🔐: Secure sign-up and login functionality.
-Profile Management 👤: Create, update, and view personal profiles.
-Matching Algorithm ❤️ (Optional): Find potential matches based on user preferences.
-Responsive UI 📱: Clean, user-friendly design that works across devices.
-API Integration 🌐: Robust API built with ASP.NET Core for data management.
-Technologies Used 🛠️
-Backend: C#, ASP.NET Core
-Frontend: TypeScript, HTML, CSS (commonly integrated with frameworks such as Angular)
-Database: (Your chosen relational or NoSQL database – update details as needed)
-Other Tools: .NET CLI, Node.js, npm, etc.
-Installation 💻
-Follow the steps below to set up the project locally.
+A modern, full-stack dating application built with ASP.NET Core and TypeScript. This project demonstrates best practices in web development, including real-time communication, authentication, and profile management.
 
-Prerequisites ⚙️
-.NET 6 SDK (or later)
-Node.js (which includes npm)
-(Optional) Angular CLI if the client is built with Angular:
-bash
-Copy
-Edit
+## Table of Contents 📚
+- [Features](#features-)
+- [Technologies](#technologies-)
+- [Architecture](#architecture-)
+- [Installation](#installation-)
+- [Configuration](#configuration-)
+- [API Documentation](#api-documentation-)
+- [Development](#development-)
+- [Contributing](#contributing-)
+- [License](#license-)
+
+## Features ✨
+- **User Authentication & Authorization** 🔐
+  - JWT-based authentication
+  - Role-based access control
+  - Secure password management
+  - Email verification
+
+- **Profile Management** 👤
+  - Rich user profiles with photos
+  - Profile customization
+  - Search and filtering capabilities
+  - Like/Dislike functionality
+
+- **Real-time Communication** 💬
+  - Live chat using SignalR
+  - Online presence tracking
+  - Message notifications
+  - Read receipts
+
+- **Matching System** ❤️
+  - Advanced matching algorithm
+  - Location-based matching
+  - Interest-based recommendations
+  - Match notifications
+
+## Technologies 🛠️
+### Backend
+- ASP.NET Core 7.0
+- Entity Framework Core
+- SQLite (Development) / SQL Server (Production)
+- SignalR for real-time features
+- JWT Authentication
+- AutoMapper for object mapping
+- xUnit for testing
+
+### Frontend
+- TypeScript
+- Angular 15+
+- Bootstrap 5
+- NgRx for state management
+- SignalR client for real-time features
+
+## Architecture 🏗️
+The application follows a clean architecture pattern with:
+- Domain-driven design
+- Repository pattern
+- CQRS pattern for complex operations
+- Dependency injection
+- Middleware for cross-cutting concerns
+
+## Installation 💻
+1. Clone the repository
+2. Install .NET 7.0 SDK
+3. Install Node.js 16+ and npm
+4. Install Angular CLI globally:
+```bash
 npm install -g @angular/cli
-Backend Setup 🖥️
-Open a terminal and navigate to the API folder.
-Restore the dependencies:
-bash
-Copy
-Edit
+```
+
+### Backend Setup
+```bash
+cd api
 dotnet restore
-Build and run the API:
-bash
-Copy
-Edit
 dotnet run
-The API should be running on a default port (e.g., http://localhost:5000). Check the output for the exact URL.
-Frontend Setup 🌟
-Open another terminal and navigate to the client folder.
-Install the required npm packages:
-bash
-Copy
-Edit
+```
+
+### Frontend Setup
+```bash
+cd client
 npm install
-Start the development server:
-bash
-Copy
-Edit
-npm start
-Or, if using Angular:
-bash
-Copy
-Edit
 ng serve
-Open your browser and go to http://localhost:4200 (or the URL provided in the terminal) to view the application.
-Configuration ⚙️
-Before running the application, ensure that you have configured any necessary settings, such as:
+```
 
-Database connection strings (typically set in an appsettings.json or via environment variables for the API).
-Environment-specific variables for the client-side configuration.
-Usage 🚀
-Once both the backend and frontend are running, you can:
+## Configuration ⚙️
+### Backend Configuration
+- Update `appsettings.json` with your database connection string
+- Configure JWT settings in `appsettings.json`
+- Set up email service configuration
 
-Register a new account.
-Create or update your user profile.
-Browse through other profiles and (if implemented) check for matches.
-Use the API endpoints for further integration or development.
-Course Details 🎓
-This project is part of a Udemy course aimed at teaching full-stack web development. For more information and additional resources, visit the course page: Udemy Course.
+### Frontend Configuration
+- Update API endpoints in `environment.ts`
+- Configure SignalR hub URL
+- Set up authentication settings
 
-Contributing 🤝
-Contributions are welcome! If you’d like to contribute to this project, please follow these steps:
+## API Documentation 📖
+The API documentation is available at `/swagger` when running in development mode. It includes:
+- Authentication endpoints
+- User management
+- Profile operations
+- Messaging system
+- Matching functionality
 
-Fork the repository.
-Create a new branch for your feature or bugfix.
-Commit your changes and push your branch.
-Open a pull request describing your changes.
-Please ensure your code adheres to the project’s coding conventions and passes any relevant tests.
+## Development 🚀
+### Backend Development
+- Follow C# coding standards
+- Use dependency injection
+- Implement proper error handling
+- Write unit tests for new features
 
-License 📄
-This project is provided for educational purposes as part of a Udemy course. (Include any specific license information if available, e.g., MIT, Apache, etc.)
+### Frontend Development
+- Follow Angular style guide
+- Use TypeScript best practices
+- Implement responsive design
+- Write unit tests
 
-Acknowledgments 🙏
-Special thanks to the Udemy course instructors and the community for providing guidance and feedback.
-Additional thanks to all contributors who have helped improve the project.
+## Contributing 🤝
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License 📄
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

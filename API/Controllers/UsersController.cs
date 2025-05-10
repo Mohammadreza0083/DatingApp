@@ -10,11 +10,20 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    /// <summary>
+    /// Controller for managing user-related operations
+    /// Handles user profiles, photos, and member information
+    /// </summary>
     [Authorize]
     public class UsersController 
         (IUnitOfWork repo, IMapper mapper, IPhotoServices photoServices) 
         : BaseApiController
     {
+        /// <summary>
+        /// Retrieves a paginated list of users based on specified parameters
+        /// </summary>
+        /// <param name="userParams">Filtering and pagination parameters</param>
+        /// <returns>List of member DTOs with pagination information</returns>
         [HttpGet]
         public async Task<ActionResult<List<MembersDto>>> GetUsers([FromQuery] UserParams userParams)
         {
@@ -24,14 +33,27 @@ namespace API.Controllers
             Response.AddPaginationHeader(users);
             return users;
         }
+
+        /// <summary>
+        /// Retrieves detailed information about a specific user
+        /// </summary>
+        /// <param name="username">Username of the user to retrieve</param>
+        /// <returns>Member DTO containing user details</returns>
         [HttpGet("{username}")]
         public async Task<ActionResult<MembersDto>> GetUser(string username)
         {
-            var user = await repo.UserRepository.GetMemberAsync(username);
+            var currentUsername = User.GetUsername();
+            var user = await repo.UserRepository.GetMemberAsync(username, 
+                isCurrentUser: currentUsername == username);
             if(user == null) return NotFound("No user found");
             return user;
         }
 
+        /// <summary>
+        /// Updates user profile information
+        /// </summary>
+        /// <param name="memberUpdateDto">DTO containing updated user information</param>
+        /// <returns>NoContent if successful, BadRequest if failed</returns>
         [HttpPut]
         public async Task<ActionResult> UpdateUser(MemberUpdateDto memberUpdateDto)
         {
@@ -48,6 +70,11 @@ namespace API.Controllers
             return BadRequest("Failed to update user");
         }
 
+        /// <summary>
+        /// Adds a new photo to the user's profile
+        /// </summary>
+        /// <param name="file">The photo file to upload</param>
+        /// <returns>Photo DTO if successful, BadRequest if failed</returns>
         [HttpPost("add-photo")]
         public async Task<ActionResult<PhotoDto>> AddPhoto(IFormFile file)
         {
@@ -70,12 +97,6 @@ namespace API.Controllers
                 Url = result.Result.SecureUrl.AbsoluteUri,
                 PublicId = result.Result.PublicId
             };
-            
-            if (user.Photos.Count is 0)
-            {
-                photo.IsMain = true;
-            }
-            
             user.Photos.Add(photo);
 
             if (await repo.Complete())
@@ -88,6 +109,11 @@ namespace API.Controllers
             return BadRequest("Failed to add photo");
         }
 
+        /// <summary>
+        /// Sets a photo as the main profile photo
+        /// </summary>
+        /// <param name="photoId">ID of the photo to set as main</param>
+        /// <returns>NoContent if successful, BadRequest if failed</returns>
         [HttpPut("set-main-photo/{photoId}")]
         public async Task<ActionResult<PhotoDto>> SetMainPhoto(int photoId)
         {
@@ -115,6 +141,11 @@ namespace API.Controllers
             return BadRequest("Failed to set main photo");
         }
 
+        /// <summary>
+        /// Deletes a photo from the user's profile
+        /// </summary>
+        /// <param name="photoId">ID of the photo to delete</param>
+        /// <returns>NoContent if successful, BadRequest if failed</returns>
         [HttpDelete("delete-photo/{photoId}")]
         public async Task<ActionResult> DeletePhoto(int photoId)
         {
@@ -123,7 +154,7 @@ namespace API.Controllers
             {
                 return BadRequest("No user found");
             }
-            var photo = user.Photos.FirstOrDefault(x => x.Id == photoId);
+            var photo = await repo.PhotoRepository.GetPhotoByIdAsync(photoId);
             var photos = user.Photos;
             if (photo is null)
             {
@@ -138,7 +169,6 @@ namespace API.Controllers
                     photos.FirstOrDefault()!.IsMain = true;
                 }
             }
-
             if (photo.PublicId is not null)
             {
                 var result = photoServices.DeletePhotoAsync(photo.PublicId);
@@ -150,7 +180,7 @@ namespace API.Controllers
             user.Photos.Remove(photo);
             if (await repo.Complete())
             {
-                return Ok();
+                return NoContent();
             }
             return BadRequest("Failed to delete photo");
         }

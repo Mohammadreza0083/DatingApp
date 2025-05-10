@@ -2,19 +2,22 @@
 
 namespace API.Interfaces;
 
+/// <summary>
+/// Interface for managing photo operations with Cloudinary
+/// </summary>
 public interface IPhotoServices
 {
     /// <summary>
-    /// Get a file and upload on cloudinary
+    /// Uploads a photo to Cloudinary
     /// </summary>
-    /// <param name="file"></param>
-    /// <returns>UploadResult</returns>
+    /// <param name="file">The file to upload</param>
+    /// <returns>The result of the upload operation</returns>
     Task<ImageUploadResult> AddPhotoAsync(IFormFile file);
     
     /// <summary>
-    /// Use photo public id anf delete photo
+    /// Deletes a photo from Cloudinary
     /// </summary>
-    /// <param name="publicId"></param>
-    /// <returns>DeleteResult</returns>
+    /// <param name="publicId">The public ID of the photo to delete</param>
+    /// <returns>The result of the deletion operation</returns>
     Task<DeletionResult> DeletePhotoAsync(string publicId);
 }

@@ -1,10 +1,10 @@
 ﻿namespace API.DTO;
 
 /// <summary>
-/// Data transfer object for user photos
-/// Used for displaying photos in the user interface
+/// Data transfer object for photos awaiting approval
+/// Used in the photo moderation process
 /// </summary>
-public class PhotoDto
+public class PhotoForApprovalDto
 {
     /// <summary>
     /// Unique identifier for the photo
@@ -14,12 +14,12 @@ public class PhotoDto
     /// <summary>
     /// URL of the photo
     /// </summary>
-    public string? Url { get; set; }
+    public required string Url { get; set; }
 
     /// <summary>
-    /// Indicates whether this is the user's main profile photo
+    /// Username of the user who uploaded the photo
     /// </summary>
-    public bool IsMain { get; set; }
+    public string? Username { get; set; }
 
     /// <summary>
     /// Indicates whether the photo has been approved by moderators
